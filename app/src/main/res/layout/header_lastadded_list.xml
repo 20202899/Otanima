@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:text="ÚLTIMOS EPISÓDIOS ADICIONADOS"
+    android:textStyle="bold"
+    android:textColor="@android:color/white"
+    android:textSize="16sp"
+    android:layout_marginTop="@dimen/fab_margin"
+    android:layout_marginStart="@dimen/fab_margin"
+    android:layout_marginBottom="8dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"/>
