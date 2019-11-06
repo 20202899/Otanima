@@ -38,7 +38,11 @@ class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    override fun getItemCount() = mData.size + 1
+    override fun getItemCount() = if (mData.size > 0) {
+        mData.size + 1
+    }else {
+        mData.size
+    }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is MyViewHolder) {

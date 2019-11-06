@@ -82,7 +82,7 @@ class AddedEpisodesFragment : Fragment(), Observer {
     }
 
     private fun getModeEpisodies(url: String?) {
-        val stringRequest = object : StringRequest(Method.POST, "https://app-otanima.herokuapp.com/api-home-anime", {
+        val stringRequest = object : StringRequest(Method.POST, "https://app-otanima.herokuapp.com/home-anime", {
             val home = mGson.fromJson<Home>(it, Home::class.java)
 
             with(activity) {

@@ -95,13 +95,13 @@ class VideoActivity : AppCompatActivity() {
 
         hd.setOnClickListener {
             container.visibility = View.GONE
-            video.setVideoPath(mHome.streams[0].play_url)
+            video.setVideoPath(mHome.streams[1].play_url)
             video.start()
         }
 
         sd.setOnClickListener {
             container.visibility = View.GONE
-            video.setVideoPath(mHome.streams[1].play_url)
+            video.setVideoPath(mHome.streams[0].play_url)
             video.start()
         }
 

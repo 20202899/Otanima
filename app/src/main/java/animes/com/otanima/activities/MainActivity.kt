@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     private fun initRequest() {
         progress_circular.visibility = ProgressBar.VISIBLE
 //        container_today.visibility = LinearLayout.GONE
-        val stringRequest = object : StringRequest(Request.Method.POST, "https://app-otanima.herokuapp.com/api-home-anime", {
+        val stringRequest = object : StringRequest(Request.Method.POST, "https://app-otanima.herokuapp.com/home-anime", {
             val home = mGson.fromJson<Home>(it, Home::class.java)
             mHomeObservable.setValue(home)
             progress_circular.visibility = ProgressBar.GONE
