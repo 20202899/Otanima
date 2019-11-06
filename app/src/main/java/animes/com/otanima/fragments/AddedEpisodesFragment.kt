@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
@@ -55,6 +56,15 @@ class AddedEpisodesFragment : Fragment(), Observer {
     }
 
     private fun initViews() {
+        val mainActivity = activity as? MainActivity
+
+        mainActivity?.fab_top?.setOnClickListener {
+            recyclerview.scrollToPosition(0)
+            mainActivity.appbar?.setExpanded(true)
+            mainActivity.fab_top?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.anim_out))
+            mainActivity.fab_top?.visibility = View.INVISIBLE
+        }
+
         recyclerview.setHasFixedSize(true)
         val layoutManager = GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false).apply {
             spanSizeLookup = object : GridLayoutManager.SpanSizeLookup () {
@@ -74,6 +84,18 @@ class AddedEpisodesFragment : Fragment(), Observer {
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
                 if (mHomeObservable != null) {
                     getModeEpisodies(mHomeObservable!!.getValue()!!.nextAddedEpisodes)
+                }
+            }
+
+            override fun onScrolled(view: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(view, dx, dy)
+
+                if (mainActivity?.fab_top?.visibility == View.INVISIBLE && dy > 0) {
+                    mainActivity.fab_top?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.anim_in))
+                    mainActivity.fab_top?.visibility = View.VISIBLE
+                }else if (mainActivity?.fab_top?.visibility == View.VISIBLE && dy < 0) {
+                    mainActivity.fab_top?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.anim_out))
+                    mainActivity.fab_top?.visibility = View.INVISIBLE
                 }
             }
         })
