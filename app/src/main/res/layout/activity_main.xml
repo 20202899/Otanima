@@ -94,6 +94,7 @@
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        android:layout_marginTop="@dimen/fab_margin"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <include layout="@layout/bottom_sheet_search"/>
