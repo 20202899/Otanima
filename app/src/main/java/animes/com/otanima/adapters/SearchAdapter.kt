@@ -13,11 +13,11 @@ import animes.com.otanima.models.Anime
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 
-class TodayAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class SearchAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var mData = mutableListOf<Anime>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_today_list,
+        return MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_search_list,
             parent, false))
     }
 

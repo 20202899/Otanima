@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import animes.com.otanima.R
 import animes.com.otanima.activities.VideoActivity
-import animes.com.otanima.models.AnimeEpisode
 import animes.com.otanima.models.Episode
 
 class EpisodesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
