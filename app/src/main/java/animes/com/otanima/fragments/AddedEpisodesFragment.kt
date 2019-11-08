@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +25,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.bottom_sheet_search.*
 import kotlinx.android.synthetic.main.fragment_lastadded.*
 import java.util.*
 
@@ -61,24 +63,36 @@ class AddedEpisodesFragment : Fragment(), Observer {
         mainActivity?.fab_top?.setOnClickListener {
             recyclerview.scrollToPosition(0)
             mainActivity.appbar?.setExpanded(true)
-            mainActivity.fab_top?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.anim_out))
+            mainActivity.fab_top?.startAnimation(
+                AnimationUtils.loadAnimation(
+                    context,
+                    R.anim.anim_out
+                )
+            )
             mainActivity.fab_top?.visibility = View.INVISIBLE
         }
 
         recyclerview.setHasFixedSize(true)
         val layoutManager = GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false).apply {
-            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup () {
+            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
-                    return if (position == 0)
+                    return if (position == 0) {
                         2
-                    else
-                        1
+                    } else if (position == 1) {
+                        return 2
+                    }else{
+
+                        if (position % 3 == 1)
+                            2
+                        else
+                            1
+                    }
+
                 }
 
             }
         }
         recyclerview.layoutManager = layoutManager
-
 
         recyclerview.addOnScrollListener(object : EndlessRecyclerViewScrollListener(layoutManager) {
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
@@ -91,10 +105,20 @@ class AddedEpisodesFragment : Fragment(), Observer {
                 super.onScrolled(view, dx, dy)
 
                 if (mainActivity?.fab_top?.visibility == View.INVISIBLE && dy > 0) {
-                    mainActivity.fab_top?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.anim_in))
+                    mainActivity.fab_top?.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            context,
+                            R.anim.anim_in
+                        )
+                    )
                     mainActivity.fab_top?.visibility = View.VISIBLE
-                }else if (mainActivity?.fab_top?.visibility == View.VISIBLE && dy < 0) {
-                    mainActivity.fab_top?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.anim_out))
+                } else if (mainActivity?.fab_top?.visibility == View.VISIBLE && dy < 0) {
+                    mainActivity.fab_top?.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            context,
+                            R.anim.anim_out
+                        )
+                    )
                     mainActivity.fab_top?.visibility = View.INVISIBLE
                 }
             }
@@ -104,28 +128,29 @@ class AddedEpisodesFragment : Fragment(), Observer {
     }
 
     private fun getModeEpisodies(url: String?) {
-        val stringRequest = object : StringRequest(Method.POST, "https://app-otanima.herokuapp.com/home-anime", {
-            val home = mGson.fromJson<Home>(it, Home::class.java)
+        val stringRequest =
+            object : StringRequest(Method.POST, "https://app-otanima.herokuapp.com/home-anime", {
+                val home = mGson.fromJson<Home>(it, Home::class.java)
 
-            with(activity) {
-                if (this is MainActivity) {
-                    mHomeObservable.setValue(home)
+                with(activity) {
+                    if (this is MainActivity) {
+                        mHomeObservable.setValue(home)
+                    }
+                }
+
+            }, {
+                Log.d("t", "t")
+            }) {
+
+                override fun getBodyContentType(): String {
+                    return "application/json"
+                }
+
+                override fun getBody(): ByteArray {
+                    val ob = Url(url!!)
+                    return mGson.toJson(ob).toByteArray(Charsets.UTF_8)
                 }
             }
-
-        }, {
-            Log.d("t", "t")
-        }){
-
-            override fun getBodyContentType(): String {
-                return "application/json"
-            }
-
-            override fun getBody(): ByteArray {
-                val ob = Url(url!!)
-                return mGson.toJson(ob).toByteArray(Charsets.UTF_8)
-            }
-        }
 
         stringRequest.retryPolicy = DefaultRetryPolicy(
             20000,
@@ -133,6 +158,11 @@ class AddedEpisodesFragment : Fragment(), Observer {
         )
 
         AppController.sInstance?.addRequest(stringRequest)
+    }
+
+    fun setListEnabled(b: Boolean) {
+        recyclerview.isEnabled = b
+        ViewCompat.setNestedScrollingEnabled(recyclerview, b)
     }
 
     companion object {

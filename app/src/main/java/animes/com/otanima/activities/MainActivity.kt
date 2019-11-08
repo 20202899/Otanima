@@ -12,7 +12,9 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import androidx.appcompat.widget.SearchView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
 import androidx.core.view.size
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import animes.com.otanima.R
 import animes.com.otanima.adapters.SearchAdapter
@@ -117,6 +119,12 @@ class MainActivity : AppCompatActivity() {
         AppController.sInstance?.addRequest(stringRequest)
     }
 
+
+    private fun findFragmentById(id: Int): Fragment? {
+        return supportFragmentManager
+            .findFragmentById(R.id.lastAdded)
+    }
+
     private fun requestSearch(text: String?) {
 
         if (text.isNullOrEmpty())
@@ -124,6 +132,7 @@ class MainActivity : AppCompatActivity() {
 
         val url = "https://www.animesonehd.org/?s=$text"
         val stringRequest = StringRequest(Request.Method.GET, url, {
+            (findFragmentById(R.id.lastAdded) as? AddedEpisodesFragment)?.setListEnabled(false)
             val doc = Jsoup.parse(it)
             val params = CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT,
                 CoordinatorLayout.LayoutParams.MATCH_PARENT)
@@ -144,6 +153,7 @@ class MainActivity : AppCompatActivity() {
             mAdapter.setData(animesItem)
             mBottomSheetBehavior.isHideable = false
             appbar.setExpanded(false)
+            ViewCompat.setNestedScrollingEnabled(recyclerview_sheet, false)
             bottom_sheet.layoutParams = params
 
         }, {
@@ -172,6 +182,7 @@ class MainActivity : AppCompatActivity() {
         mSearchView.setOnCloseListener {
 
             if (mBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                (findFragmentById(R.id.lastAdded) as? AddedEpisodesFragment)?.setListEnabled(true)
                 val params = CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT,
                     CoordinatorLayout.LayoutParams.WRAP_CONTENT)
                 mBottomSheetBehavior.isHideable = true
@@ -179,6 +190,7 @@ class MainActivity : AppCompatActivity() {
                 mBottomSheetBehavior.isHideable = false
                 mAdapter.setData(mutableListOf())
                 appbar.setExpanded(true)
+                ViewCompat.setNestedScrollingEnabled(recyclerview_sheet, true)
                 bottom_sheet.layoutParams = params
             }
             return@setOnCloseListener false

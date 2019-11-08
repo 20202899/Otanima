@@ -14,6 +14,7 @@
         android:theme="@style/AppTheme.AppBarOverlay">
         <com.google.android.material.appbar.CollapsingToolbarLayout
             app:titleEnabled="false"
+            android:id="@+id/collapsebar"
             app:contentScrim="@color/colorPrimary"
             app:collapsedTitleGravity="bottom"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
