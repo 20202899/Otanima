@@ -22,4 +22,8 @@ class AppController : Application() {
     fun<T> addRequest(request: Request<T>) {
         mQueue.add(request)
     }
+
+    fun cancelRequest(tag: Any?) {
+        mQueue.cancelAll(tag)
+    }
 }

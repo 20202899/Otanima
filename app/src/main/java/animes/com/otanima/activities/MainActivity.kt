@@ -1,5 +1,6 @@
 package animes.com.otanima.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -200,6 +201,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_star -> {
+                startActivity(Intent(this, FavoritesActivity::class.java))
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

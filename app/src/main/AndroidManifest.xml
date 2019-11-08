@@ -18,11 +18,17 @@
             android:screenOrientation="portrait"
             android:label="@string/title_activity_anime"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <activity android:name=".activities.FavoritesActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_favorites"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
         <activity
             android:name=".activities.VideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_video"
-            android:screenOrientation="landscape"
+            android:screenOrientation="portrait"
             android:theme="@style/FullscreenTheme" />
         <activity
             android:name=".activities.MainActivity"

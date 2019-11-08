@@ -7,4 +7,7 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_anime">AnimeActivity</string>
+    <string name="action_star">Favoritos</string>
+    <string name="action_add_star">Adicionar aos favoritos</string>
+    <string name="title_activity_favorites">Favoritos</string>
 </resources>

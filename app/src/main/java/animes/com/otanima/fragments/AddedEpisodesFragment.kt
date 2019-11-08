@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.core.view.ViewCompat
@@ -32,6 +33,8 @@ import java.util.*
 class AddedEpisodesFragment : Fragment(), Observer {
 
     private var mHomeObservable: HomeObservable? = null
+
+    private var isSearch = false
 
     override fun update(p0: Observable?, p1: Any?) {
         if (p0 is HomeObservable) {
@@ -80,7 +83,7 @@ class AddedEpisodesFragment : Fragment(), Observer {
                         2
                     } else if (position == 1) {
                         return 2
-                    }else{
+                    } else {
 
                         if (position % 3 == 1)
                             2
@@ -103,6 +106,9 @@ class AddedEpisodesFragment : Fragment(), Observer {
 
             override fun onScrolled(view: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(view, dx, dy)
+
+                if (isSearch)
+                    return
 
                 if (mainActivity?.fab_top?.visibility == View.INVISIBLE && dy > 0) {
                     mainActivity.fab_top?.startAnimation(
@@ -161,8 +167,35 @@ class AddedEpisodesFragment : Fragment(), Observer {
     }
 
     fun setListEnabled(b: Boolean) {
+        val mainActivity = activity as? MainActivity
         recyclerview.isEnabled = b
         ViewCompat.setNestedScrollingEnabled(recyclerview, b)
+        isSearch = !b
+
+        mainActivity?.fab_top?.apply {
+            if (!b) {
+                this.startAnimation(
+                    AnimationUtils.loadAnimation(
+                        context,
+                        R.anim.anim_out
+                    )
+                )
+                this.visibility = ImageView.INVISIBLE
+            }else {
+              this.startAnimation(
+                    AnimationUtils.loadAnimation(
+                        context,
+                        R.anim.anim_in
+                    )
+                )
+               this.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
     }
 
     companion object {
