@@ -42,6 +42,8 @@ class EpisodesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyDataSetChanged()
     }
 
+    fun getData() = data
+
     inner class MyViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView) {
         val txt1 = itemView.findViewById<TextView>(R.id.text1)
     }

@@ -16,15 +16,17 @@ data class Anime(var name: String, var url: String, var img: String, @PrimaryKey
     foreignKeys = [ForeignKey(
         entity = Anime::class,
         parentColumns = arrayOf("id"),
-        childColumns = arrayOf("episode_id")
+        childColumns = arrayOf("anime_id"),
+        onDelete = ForeignKey.CASCADE
     )]
 )
 data class Episode(
     var name: String,
     var url: String,
-    var data: String,
-    var img: String,
-    @ColumnInfo(name = "episode_id") var id: Int
+    var data: String?,
+    var img: String?,
+    @PrimaryKey var id: Int,
+    @ColumnInfo(name = "anime_id") var animeId: Int
 ) : Serializable
 
 class Link(var url: String) : Serializable

@@ -15,6 +15,7 @@ import animes.com.otanima.singletons.AppController
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
+import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_video.*
 import org.jsoup.Jsoup
@@ -87,6 +88,8 @@ class VideoActivity : AppCompatActivity() {
                     mHome = mGson.fromJson<Home>(value, Home::class.java)
                     opt.visibility = View.VISIBLE
                     progress_circular.visibility = View.GONE
+                    if (mHome.streams.size == 1)
+                        hd.visibility = MaterialButton.GONE
                 }
 
             }, {
