@@ -37,6 +37,7 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_sheet_search.*
 import org.jsoup.Jsoup
+import java.util.regex.Pattern
 
 class MainActivity : AppCompatActivity() {
 
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var mSearchView: SearchView
     private val mGson = Gson()
     private val mAdapter = SearchAdapter()
-
+    private val pattern = Pattern.compile("\\d+")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -143,10 +144,17 @@ class MainActivity : AppCompatActivity() {
                     val a = i.getElementsByTag("a")
                     val capa = Jsoup.parse(a.toString())
                     val urlImg = capa.getElementsByTag("img")
+                    val urlAnime = a.attr("href")
+                    val result = pattern.matcher(urlAnime)
+                    var id = -1
+                    if (result.find()) {
+                        id = result.group().toInt()
+                    }
 
                     return@map Anime(
                         a.attr("title"),
-                        a.attr("href"), urlImg.attr("src")
+                        urlAnime, urlImg.attr("src"),
+                        id
                     )
                 }
             mBottomSheetBehavior.isHideable = true

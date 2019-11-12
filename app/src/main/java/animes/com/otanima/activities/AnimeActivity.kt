@@ -1,6 +1,8 @@
 package animes.com.otanima.activities
 
 import android.os.Bundle
+import android.transition.Scene
+import android.transition.TransitionManager
 import android.util.Log
 import android.view.MenuItem
 import android.view.animation.AnimationUtils
@@ -38,15 +40,36 @@ class AnimeActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         initView()
-        initRequest()
     }
 
     private fun initView() {
-        mAnime = intent.extras["data"] as Anime?
+
+        val obj = intent.extras["data"]
+
+        if (obj is Anime) {
+            mAnime = intent.extras["data"] as Anime?
+            initRequest()
+        }else {
+            mAnimeEpisodes = intent.extras["data"] as AnimeEpisodes?
+            mAnime = mAnimeEpisodes?.anime
+
+            mAdapter.setData(mAnimeEpisodes!!.episodes)
+            recyclerview.visibility = RecyclerView.VISIBLE
+            progress_circular.visibility = ProgressBar.GONE
+            fab.startAnimation(AnimationUtils.loadAnimation(this@AnimeActivity, R.anim.anim_in))
+            fab.visibility = FloatingActionButton.VISIBLE
+        }
+
+
+
         isExistsAnime()
         title = mAnime?.name
 
         fab.setOnClickListener {
+
+//            val scene = Scene.getSceneForLayout(layout_master, R.layout.favorite_more, this)
+//           TransitionManager.go(scene)
+
             val db = AppDataBase.getDataBase(this)
             val dao = db.getDao()
             if (mAnime != null && !isExist) {

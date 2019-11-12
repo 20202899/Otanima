@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.activity_favorites.*
 
 class FavoritesActivity : AppCompatActivity() {
 
-    private lateinit var mAdater: FavoritesAdapter
+    private val mAdater = FavoritesAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,11 +22,16 @@ class FavoritesActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        mAdater = FavoritesAdapter(this)
         recyclerview.setHasFixedSize(true)
         recyclerview.layoutManager = GridLayoutManager(this,
             2, LinearLayoutManager.VERTICAL, false)
         recyclerview.adapter = mAdater
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        mAdater.load(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

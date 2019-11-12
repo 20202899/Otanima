@@ -4,8 +4,10 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import animes.com.otanima.R
 import animes.com.otanima.activities.VideoActivity
@@ -15,6 +17,7 @@ import com.bumptech.glide.Glide
 
 class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var mData = mutableListOf<Episode>()
+    private var lastIndex = -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == 0) {
@@ -62,6 +65,8 @@ class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 intent.putExtra("data", data)
                 context.startActivity(intent)
             }
+
+            setAnimation(holder, position)
         }
     }
 
@@ -69,6 +74,13 @@ class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         mData.clear()
         mData.addAll(data)
         notifyDataSetChanged()
+    }
+
+    private fun setAnimation(holder: MyViewHolder, position: Int) {
+//        if (position > lastIndex) {
+            holder.itemView.startAnimation(AnimationUtils.loadAnimation(holder.itemView.context, R.anim.anim_in))
+//            lastIndex = position
+//        }
     }
 
     inner class MyViewHolder (itemView: View) : RecyclerView.ViewHolder (itemView) {

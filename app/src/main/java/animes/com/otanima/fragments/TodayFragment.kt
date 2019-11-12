@@ -1,5 +1,8 @@
 package animes.com.otanima.fragments
 
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -23,10 +26,13 @@ import java.util.*
 
 class TodayFragment : Fragment(), Observer {
 
+    private var isAnimation = false
+
     override fun update(p0: Observable?, p1: Any?) {
         if (p0 is HomeObservable) {
             val home = p0.getValue()
             mAdapter.setData(home!!.today)
+            showContentByAnimation()
         }
     }
 
@@ -50,6 +56,16 @@ class TodayFragment : Fragment(), Observer {
         recyclerview.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         recyclerview.adapter = mAdapter
+    }
+
+    private fun showContentByAnimation() {
+        if (!isAnimation) {
+            isAnimation = true
+            (AnimatorInflater.loadAnimator(context, R.animator.show_from_right) as AnimatorSet).apply {
+                setTarget(recyclerview)
+                start()
+            }
+        }
     }
 
     companion object {

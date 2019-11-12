@@ -1,5 +1,7 @@
 package animes.com.otanima.fragments
 
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -28,6 +30,8 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_sheet_search.*
 import kotlinx.android.synthetic.main.fragment_lastadded.*
+import kotlinx.android.synthetic.main.fragment_lastadded.recyclerview
+import kotlinx.android.synthetic.main.fragment_today.*
 import java.util.*
 
 class AddedEpisodesFragment : Fragment(), Observer {
@@ -35,6 +39,7 @@ class AddedEpisodesFragment : Fragment(), Observer {
     private var mHomeObservable: HomeObservable? = null
 
     private var isSearch = false
+    private var isAnimation = false
 
     override fun update(p0: Observable?, p1: Any?) {
         if (p0 is HomeObservable) {

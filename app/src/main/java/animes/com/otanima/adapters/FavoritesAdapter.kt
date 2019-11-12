@@ -15,18 +15,9 @@ import animes.com.otanima.models.Anime
 import animes.com.otanima.models.AnimeEpisodes
 import com.bumptech.glide.Glide
 
-class FavoritesAdapter (var context: Context): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class FavoritesAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var mData = mutableListOf<AnimeEpisodes>()
-
-    init {
-        val db = AppDataBase.getDataBase(context)
-        val dao = db.getDao()
-        mData.clear()
-        mData.addAll(dao.getAnimes())
-        db.close()
-        notifyDataSetChanged()
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return MyViewHolder(
@@ -55,6 +46,15 @@ class FavoritesAdapter (var context: Context): RecyclerView.Adapter<RecyclerView
                 context.startActivity(intent)
             }
         }
+    }
+
+    fun load(context: Context) {
+        val db = AppDataBase.getDataBase(context)
+        val dao = db.getDao()
+        mData.clear()
+        mData.addAll(dao.getAnimes())
+        db.close()
+        notifyDataSetChanged()
     }
 
     inner class MyViewHolder (itemView: View) : RecyclerView.ViewHolder (itemView) {
