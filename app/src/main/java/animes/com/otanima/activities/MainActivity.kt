@@ -17,6 +17,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import animes.com.otanima.R
 import animes.com.otanima.adapters.SearchAdapter
 import animes.com.otanima.adapters.TodayAdapter
@@ -63,18 +64,18 @@ class MainActivity : AppCompatActivity() {
 
         recyclerview_sheet.setHasFixedSize(true)
         recyclerview_sheet.layoutManager = GridLayoutManager(
-            this, 2,
+            this, 1,
             GridLayoutManager.VERTICAL, false
         ).apply {
-            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int {
-                    return if (position == 0)
-                        2
-                    else
-                        1
-                }
-
-            }
+//            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+//                override fun getSpanSize(position: Int): Int {
+//                    return if (position == 0)
+//                        2
+//                    else
+//                        1
+//                }
+//
+//            }
         }
         recyclerview_sheet.adapter = mAdapter
     }
@@ -136,8 +137,10 @@ class MainActivity : AppCompatActivity() {
         val stringRequest = StringRequest(Request.Method.GET, url, {
             (findFragmentById(R.id.lastAdded) as? AddedEpisodesFragment)?.setListEnabled(false)
             val doc = Jsoup.parse(it)
-            val params = CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT,
-                CoordinatorLayout.LayoutParams.MATCH_PARENT)
+            val params = CoordinatorLayout.LayoutParams(
+                CoordinatorLayout.LayoutParams.MATCH_PARENT,
+                CoordinatorLayout.LayoutParams.MATCH_PARENT
+            )
             val type = object : TypeToken<MutableList<Anime>>() {}.type
             val animesItem = doc.getElementsByClass("AnimesItem")
                 .map { i ->
@@ -192,8 +195,10 @@ class MainActivity : AppCompatActivity() {
 
             if (mBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 (findFragmentById(R.id.lastAdded) as? AddedEpisodesFragment)?.setListEnabled(true)
-                val params = CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT,
-                    CoordinatorLayout.LayoutParams.WRAP_CONTENT)
+                val params = CoordinatorLayout.LayoutParams(
+                    CoordinatorLayout.LayoutParams.MATCH_PARENT,
+                    CoordinatorLayout.LayoutParams.WRAP_CONTENT
+                )
                 mBottomSheetBehavior.isHideable = true
                 mBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 mBottomSheetBehavior.isHideable = false
