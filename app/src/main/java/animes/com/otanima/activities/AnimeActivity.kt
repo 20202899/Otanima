@@ -1,11 +1,16 @@
 package animes.com.otanima.activities
 
+import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.transition.Scene
 import android.transition.TransitionManager
 import android.util.Log
 import android.view.MenuItem
 import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +27,10 @@ import animes.com.otanima.singletons.AppController
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.toolbox.StringRequest
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 
@@ -30,6 +39,7 @@ import kotlinx.android.synthetic.main.activity_anime.*
 class AnimeActivity : AppCompatActivity() {
 
     private var mAnime: Anime? = null
+    private var mHome: Home? = null
     private val mGson = Gson()
     private val mAdapter = EpisodesAdapter()
     private var isExist = false
@@ -43,6 +53,12 @@ class AnimeActivity : AppCompatActivity() {
     }
 
     private fun initView() {
+
+        sinopse.movementMethod = ScrollingMovementMethod()
+        sinopse.setOnTouchListener { view, motionEvent ->
+            view.parent.requestDisallowInterceptTouchEvent(true)
+            return@setOnTouchListener false
+        }
 
         val obj = intent.extras["data"]
 
@@ -58,6 +74,10 @@ class AnimeActivity : AppCompatActivity() {
             progress_circular.visibility = ProgressBar.GONE
             fab.startAnimation(AnimationUtils.loadAnimation(this@AnimeActivity, R.anim.anim_in))
             fab.visibility = FloatingActionButton.VISIBLE
+            container_anime.visibility = FrameLayout.VISIBLE
+
+            loadImage()
+            sinopse.text = mAnime?.sinopse
         }
         
         isExistsAnime()
@@ -67,6 +87,9 @@ class AnimeActivity : AppCompatActivity() {
 
 //            val scene = Scene.getSceneForLayout(layout_master, R.layout.favorite_more, this)
 //           TransitionManager.go(scene)
+
+//            val intent = Intent(this, AddActivity::class.java)
+//            startActivity(intent)
 
             val db = AppDataBase.getDataBase(this)
             val dao = db.getDao()
@@ -93,10 +116,6 @@ class AnimeActivity : AppCompatActivity() {
             initRequest()
         }
 
-        Glide.with(this)
-            .load(mAnime?.img)
-            .into(content_img)
-
         recyclerview.setHasFixedSize(true)
         recyclerview.layoutManager = LinearLayoutManager(
             this,
@@ -112,12 +131,15 @@ class AnimeActivity : AppCompatActivity() {
         load.visibility = TextView.GONE
         val stringRequest = object :
             StringRequest(Method.POST, "https://app-otanima.herokuapp.com/episodes-anime", {
-                val anime = mGson.fromJson<Home>(it, Home::class.java)
-                mAdapter.setData(anime.episodes)
+                mHome = mGson.fromJson<Home>(it, Home::class.java)
+                mAdapter.setData(mHome!!.episodes)
+                mAnime?.sinopse = mHome?.sinopse
                 recyclerview.visibility = RecyclerView.VISIBLE
                 progress_circular.visibility = ProgressBar.GONE
                 fab.startAnimation(AnimationUtils.loadAnimation(this@AnimeActivity, R.anim.anim_in))
                 fab.visibility = FloatingActionButton.VISIBLE
+                loadImage()
+                sinopse.text = mHome?.sinopse
             }, {
                 recyclerview.visibility = RecyclerView.GONE
                 progress_circular.visibility = ProgressBar.GONE
@@ -141,6 +163,37 @@ class AnimeActivity : AppCompatActivity() {
         )
 
         AppController.sInstance?.addRequest(stringRequest)
+    }
+
+    private fun loadImage() {
+        Glide.with(this)
+            .load(mAnime?.img)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    supportStartPostponedEnterTransition()
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    supportStartPostponedEnterTransition()
+                    return false
+                }
+
+            })
+            .into(content_img)
+
+        container_anime.visibility = FrameLayout.VISIBLE
     }
 
     private fun isExistsAnime() {

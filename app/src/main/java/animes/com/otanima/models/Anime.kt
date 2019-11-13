@@ -5,7 +5,8 @@ import java.io.Serializable
 
 
 @Entity(tableName = "Anime")
-data class Anime(var name: String, var url: String, var img: String, @PrimaryKey var id: Int = -1) :
+data class Anime(var name: String, var url: String, var img: String, @PrimaryKey var id: Int = -1,
+                 var sinopse: String? = "") :
     Serializable
 
 @Entity(

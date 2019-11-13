@@ -141,7 +141,6 @@ class MainActivity : AppCompatActivity() {
                 CoordinatorLayout.LayoutParams.MATCH_PARENT,
                 CoordinatorLayout.LayoutParams.MATCH_PARENT
             )
-            val type = object : TypeToken<MutableList<Anime>>() {}.type
             val animesItem = doc.getElementsByClass("AnimesItem")
                 .map { i ->
                     val a = i.getElementsByTag("a")
@@ -150,6 +149,7 @@ class MainActivity : AppCompatActivity() {
                     val urlAnime = a.attr("href")
                     val result = pattern.matcher(urlAnime)
                     var id = -1
+
                     if (result.find()) {
                         id = result.group().toInt()
                     }
