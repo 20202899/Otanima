@@ -23,6 +23,7 @@ import animes.com.otanima.models.Home
 import animes.com.otanima.models.Url
 import animes.com.otanima.observables.HomeObservable
 import animes.com.otanima.singletons.AppController
+import animes.com.otanima.views.CustomGridLayoutManager
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
@@ -40,6 +41,27 @@ class AddedEpisodesFragment : Fragment(), Observer {
 
     private var isSearch = false
     private var isAnimation = false
+
+    private val mLayoutManager =
+        CustomGridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false).apply {
+            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    return if (position == 0) {
+                        2
+                    } else if (position == 1) {
+                        return 2
+                    } else {
+
+                        if (position % 3 == 1)
+                            2
+                        else
+                            1
+                    }
+
+                }
+
+            }
+        }
 
     override fun update(p0: Observable?, p1: Any?) {
         if (p0 is HomeObservable) {
@@ -81,28 +103,9 @@ class AddedEpisodesFragment : Fragment(), Observer {
         }
 
         recyclerview.setHasFixedSize(true)
-        val layoutManager = GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false).apply {
-            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int {
-                    return if (position == 0) {
-                        2
-                    } else if (position == 1) {
-                        return 2
-                    } else {
+        recyclerview.layoutManager = mLayoutManager
 
-                        if (position % 3 == 1)
-                            2
-                        else
-                            1
-                    }
-
-                }
-
-            }
-        }
-        recyclerview.layoutManager = layoutManager
-
-        recyclerview.addOnScrollListener(object : EndlessRecyclerViewScrollListener(layoutManager) {
+        recyclerview.addOnScrollListener(object : EndlessRecyclerViewScrollListener(mLayoutManager) {
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
                 if (mHomeObservable != null) {
                     getModeEpisodies(mHomeObservable!!.getValue()!!.nextAddedEpisodes)
@@ -139,6 +142,11 @@ class AddedEpisodesFragment : Fragment(), Observer {
     }
 
     private fun getModeEpisodies(url: String?) {
+
+        swipe.isEnabled = true
+        swipe.isRefreshing = true
+        recyclerview.isLayoutFrozen = true
+        mLayoutManager.setIsScrollEnabled(false)
         val stringRequest =
             object : StringRequest(Method.POST, "https://app-otanima.herokuapp.com/home-anime", {
                 val home = mGson.fromJson<Home>(it, Home::class.java)
@@ -148,6 +156,11 @@ class AddedEpisodesFragment : Fragment(), Observer {
                         mHomeObservable.setValue(home)
                     }
                 }
+
+                swipe.isRefreshing = false
+                swipe.isEnabled = false
+                recyclerview.isLayoutFrozen = false
+                mLayoutManager.setIsScrollEnabled(true)
 
             }, {
                 Log.d("t", "t")
@@ -186,21 +199,16 @@ class AddedEpisodesFragment : Fragment(), Observer {
                     )
                 )
                 this.visibility = ImageView.INVISIBLE
-            }else {
-              this.startAnimation(
+            } else {
+                this.startAnimation(
                     AnimationUtils.loadAnimation(
                         context,
                         R.anim.anim_in
                     )
                 )
-               this.visibility = View.VISIBLE
+                this.visibility = View.VISIBLE
             }
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-
     }
 
     companion object {

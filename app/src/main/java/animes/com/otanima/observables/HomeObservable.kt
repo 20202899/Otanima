@@ -16,6 +16,7 @@ class HomeObservable : Observable() {
         }
 
         value!!.today = home.today
+        value!!.lastAddedEpisodes.clear()
         value!!.lastAddedEpisodes.addAll(home.lastAddedEpisodes)
         value!!.nextAddedEpisodes = home.nextAddedEpisodes
 

@@ -19,6 +19,10 @@ class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var mData = mutableListOf<Episode>()
     private var lastIndex = -1
 
+    init {
+        setHasStableIds(true)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == 0) {
             HeaderViewHolder(
@@ -38,6 +42,14 @@ class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             0
         }else {
             1
+        }
+    }
+
+    override fun getItemId(position: Int): Long {
+        return if (position == 0) {
+            hashCode().toLong()
+        }else {
+            mData[position - 1].id.toLong()
         }
     }
 
@@ -71,9 +83,16 @@ class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     fun setData (data: MutableList<Episode>) {
-        mData.clear()
-        mData.addAll(data)
-        notifyDataSetChanged()
+        if (mData.size == 0) {
+            mData.addAll(data)
+            notifyDataSetChanged()
+        }else {
+            data.forEach {
+                mData.add(it)
+                notifyItemInserted(mData.lastIndex + 1)
+            }
+        }
+
     }
 
     private fun setAnimation(holder: MyViewHolder, position: Int) {

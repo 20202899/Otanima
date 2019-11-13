@@ -59,9 +59,7 @@ class AnimeActivity : AppCompatActivity() {
             fab.startAnimation(AnimationUtils.loadAnimation(this@AnimeActivity, R.anim.anim_in))
             fab.visibility = FloatingActionButton.VISIBLE
         }
-
-
-
+        
         isExistsAnime()
         title = mAnime?.name
 
