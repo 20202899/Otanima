@@ -149,7 +149,6 @@ class AnimeActivity : AppCompatActivity() {
                 mAdapter.setData(mHome!!.episodes)
                 mAnime?.sinopse = mHome?.sinopse
                 recyclerview.visibility = RecyclerView.VISIBLE
-                progress_circular.visibility = ProgressBar.GONE
                 fab.startAnimation(AnimationUtils.loadAnimation(this@AnimeActivity, R.anim.anim_in))
                 fab.visibility = FloatingActionButton.VISIBLE
                 loadImage()
@@ -180,18 +179,23 @@ class AnimeActivity : AppCompatActivity() {
     }
 
     private fun loadImage() {
-        Glide.with(this)
-            .asBitmap()
-            .load(mAnime?.img)
-            .into(object : BitmapImageViewTarget(content_img) {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    super.onResourceReady(resource, transition)
-                    createPaletteFromImageView()
-                }
-            })
+        if (!isFinishing) {
+            Glide.with(this)
+                .asBitmap()
+                .load(mAnime?.img)
+                .into(object : BitmapImageViewTarget(content_img) {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        super.onResourceReady(resource, transition)
+                        createPaletteFromImageView()
+                    }
+                })
 
-        container_anime.visibility = FrameLayout.VISIBLE
-        circularAnim()
+            mHandler.postDelayed({
+                progress_circular.visibility = ProgressBar.GONE
+                container_anime.visibility = FrameLayout.VISIBLE
+                circularAnim()
+            }, 800)
+        }
     }
 
     private fun createPaletteFromImageView() {
@@ -199,9 +203,6 @@ class AnimeActivity : AppCompatActivity() {
         if (bitmap != null) {
             Palette.from(bitmap)
                 .generate {
-                    val changeBounds = ChangeBounds()
-                    changeBounds.duration = 700
-                    changeBounds.interpolator = AccelerateDecelerateInterpolator()
                     with(toolbar) {
                         setBackgroundColor(
                             it?.vibrantSwatch?.rgb ?: ContextCompat.getColor(
@@ -272,7 +273,6 @@ class AnimeActivity : AppCompatActivity() {
 
                     mAdapter.notifyDataSetChanged()
 
-//                    TransitionManager.beginDelayedTransition(container, changeBounds)
                 }
         }
     }

@@ -1,13 +1,12 @@
 package animes.com.otanima.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
@@ -47,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var mSearchView: SearchView
     private val mGson = Gson()
     private val mAdapter = SearchAdapter()
+    private var isSearch = false
     private val pattern = Pattern.compile("\\d+")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -168,6 +168,8 @@ class MainActivity : AppCompatActivity() {
             ViewCompat.setNestedScrollingEnabled(recyclerview_sheet, false)
             bottom_sheet.layoutParams = params
 
+            isSearch = true
+
         }, {
 
         })
@@ -183,33 +185,37 @@ class MainActivity : AppCompatActivity() {
         mSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 requestSearch(query)
+                activity_main.requestFocus()
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                return false
+                return true
             }
 
         })
-        mSearchView.setOnCloseListener {
-
-            if (mBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-                (findFragmentById(R.id.lastAdded) as? AddedEpisodesFragment)?.setListEnabled(true)
-                val params = CoordinatorLayout.LayoutParams(
-                    CoordinatorLayout.LayoutParams.MATCH_PARENT,
-                    CoordinatorLayout.LayoutParams.WRAP_CONTENT
-                )
-                mBottomSheetBehavior.isHideable = true
-                mBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                mBottomSheetBehavior.isHideable = false
-                mAdapter.setData(mutableListOf())
-                appbar.setExpanded(true)
-                ViewCompat.setNestedScrollingEnabled(recyclerview_sheet, true)
-                bottom_sheet.layoutParams = params
-            }
-            return@setOnCloseListener false
-        }
+//        mSearchView.setOnCloseListener {
+//            closeSearch()
+//            return@setOnCloseListener false
+//        }
         return true
+    }
+
+    private fun closeSearch() {
+        if (mBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+            (findFragmentById(R.id.lastAdded) as? AddedEpisodesFragment)?.setListEnabled(true)
+            val params = CoordinatorLayout.LayoutParams(
+                CoordinatorLayout.LayoutParams.MATCH_PARENT,
+                CoordinatorLayout.LayoutParams.WRAP_CONTENT
+            )
+            mBottomSheetBehavior.isHideable = true
+            mBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            mBottomSheetBehavior.isHideable = false
+            mAdapter.setData(mutableListOf())
+            appbar.setExpanded(true)
+            ViewCompat.setNestedScrollingEnabled(recyclerview_sheet, true)
+            bottom_sheet.layoutParams = params
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -220,5 +226,18 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+
+        return if (!isSearch) {
+            super.onKeyDown(keyCode, event)
+        }else {
+            closeSearch()
+            isSearch = false
+            false
+        }
+
+
     }
 }

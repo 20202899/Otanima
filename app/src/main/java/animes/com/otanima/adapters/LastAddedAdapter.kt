@@ -14,6 +14,10 @@ import animes.com.otanima.activities.VideoActivity
 import animes.com.otanima.models.Anime
 import animes.com.otanima.models.Episode
 import com.bumptech.glide.Glide
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.view.animation.AccelerateDecelerateInterpolator
+
 
 class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var mData = mutableListOf<Episode>()
@@ -28,19 +32,23 @@ class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             HeaderViewHolder(
                 LayoutInflater.from(parent.context).inflate(
                     R.layout.header_lastadded_list,
-                    parent, false))
-        }else {
+                    parent, false
+                )
+            )
+        } else {
             MyViewHolder(
                 LayoutInflater.from(parent.context).inflate(
                     R.layout.item_lastadded_list,
-                    parent, false))
+                    parent, false
+                )
+            )
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return if (position == 0) {
             0
-        }else {
+        } else {
             1
         }
     }
@@ -48,14 +56,14 @@ class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemId(position: Int): Long {
         return if (position == 0) {
             hashCode().toLong()
-        }else {
+        } else {
             mData[position - 1].id.toLong()
         }
     }
 
     override fun getItemCount() = if (mData.size > 0) {
         mData.size + 1
-    }else {
+    } else {
         mData.size
     }
 
@@ -69,7 +77,7 @@ class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
             holder.text1.text = data.name
 
-            holder.itemView.setOnClickListener (null)
+            holder.itemView.setOnClickListener(null)
 
             holder.itemView.setOnClickListener {
                 val context = it.context
@@ -82,11 +90,11 @@ class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    fun setData (data: MutableList<Episode>) {
+    fun setData(data: MutableList<Episode>) {
         if (mData.size == 0) {
             mData.addAll(data)
             notifyDataSetChanged()
-        }else {
+        } else {
             data.forEach {
                 mData.add(it)
                 notifyItemInserted(mData.lastIndex + 1)
@@ -97,17 +105,35 @@ class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private fun setAnimation(holder: MyViewHolder, position: Int) {
 //        if (position > lastIndex) {
-            holder.itemView.startAnimation(AnimationUtils.loadAnimation(holder.itemView.context, R.anim.anim_in))
+        holder.itemView.startAnimation(
+            AnimationUtils.loadAnimation(
+                holder.itemView.context,
+                R.anim.anim_in
+            )
+        )
+
+        val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
+            holder.img_play,
+            PropertyValuesHolder.ofFloat("scaleX", 1.4f),
+            PropertyValuesHolder.ofFloat("scaleY", 1.4f)
+        )
+        scaleDown.duration = 1000
+        scaleDown.interpolator = AccelerateDecelerateInterpolator()
+        scaleDown.repeatCount = ObjectAnimator.INFINITE
+        scaleDown.repeatMode = ObjectAnimator.REVERSE
+
+        scaleDown.start()
 //            lastIndex = position
 //        }
     }
 
-    inner class MyViewHolder (itemView: View) : RecyclerView.ViewHolder (itemView) {
+    inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val img = itemView.findViewById<ImageView>(R.id.img)
+        val img_play = itemView.findViewById<ImageView>(R.id.img_play)
         val text1 = itemView.findViewById<TextView>(R.id.text1)
     }
 
-    inner class HeaderViewHolder (itemView: View) : RecyclerView.ViewHolder (itemView) {
+    inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     }
 

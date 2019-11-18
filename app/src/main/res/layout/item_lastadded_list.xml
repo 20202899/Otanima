@@ -30,6 +30,7 @@
         android:layout_height="match_parent">
 
         <ImageView
+            android:id="@+id/img_play"
             android:layout_gravity="center"
             android:src="@drawable/ic_play_arrow_white_24dp"
             android:adjustViewBounds="true"

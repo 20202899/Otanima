@@ -90,8 +90,8 @@ class AddedEpisodesFragment : Fragment(), Observer {
     private fun initViews() {
         val mainActivity = activity as? MainActivity
 
-        swipe.isEnabled = true
-        swipe.isRefreshing = true
+//        swipe.isEnabled = true
+//        swipe.isRefreshing = true
 
         mainActivity?.fab_top?.setOnClickListener {
             recyclerview.scrollToPosition(0)
