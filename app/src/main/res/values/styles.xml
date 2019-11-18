@@ -33,7 +33,7 @@
     </style>
 
     <style name="ProgressBar" parent="Widget.AppCompat.ProgressBar">
-        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorPrimaryDark</item>
     </style>
 
 </resources>

@@ -8,7 +8,7 @@ import animes.com.otanima.interfaces.Dao
 import animes.com.otanima.models.Anime
 import animes.com.otanima.models.Episode
 
-@Database (entities = [Anime::class, Episode::class], version = 1)
+@Database (entities = [Anime::class, Episode::class], version = 2)
 abstract class AppDataBase : RoomDatabase() {
     abstract fun getDao(): Dao
 

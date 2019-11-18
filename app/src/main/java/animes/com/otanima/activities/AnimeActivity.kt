@@ -1,19 +1,32 @@
 package animes.com.otanima.activities
 
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Handler
 import android.text.method.ScrollingMovementMethod
+import android.transition.ChangeBounds
 import android.transition.Scene
 import android.transition.TransitionManager
 import android.util.Log
 import android.view.MenuItem
+import android.view.ViewAnimationUtils
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
+import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,11 +43,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.BitmapImageViewTarget
 import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 
 import kotlinx.android.synthetic.main.activity_anime.*
+import kotlin.math.hypot
 
 class AnimeActivity : AppCompatActivity() {
 
@@ -44,6 +60,7 @@ class AnimeActivity : AppCompatActivity() {
     private val mAdapter = EpisodesAdapter()
     private var isExist = false
     private var mAnimeEpisodes: AnimeEpisodes? = null
+    private val mHandler = Handler()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_anime)
@@ -65,32 +82,27 @@ class AnimeActivity : AppCompatActivity() {
         if (obj is Anime) {
             mAnime = intent.extras["data"] as Anime?
             initRequest()
-        }else {
+        } else {
             mAnimeEpisodes = intent.extras["data"] as AnimeEpisodes?
             mAnime = mAnimeEpisodes?.anime
 
-            mAdapter.setData(mAnimeEpisodes!!.episodes)
-            recyclerview.visibility = RecyclerView.VISIBLE
-            progress_circular.visibility = ProgressBar.GONE
-            fab.startAnimation(AnimationUtils.loadAnimation(this@AnimeActivity, R.anim.anim_in))
-            fab.visibility = FloatingActionButton.VISIBLE
-            container_anime.visibility = FrameLayout.VISIBLE
+            mHandler.postDelayed({
+                mAdapter.setData(mAnimeEpisodes!!.episodes)
+                recyclerview.visibility = RecyclerView.VISIBLE
+                progress_circular.visibility = ProgressBar.GONE
+                fab.startAnimation(AnimationUtils.loadAnimation(this@AnimeActivity, R.anim.anim_in))
+                fab.visibility = FloatingActionButton.VISIBLE
+                container_anime.visibility = FrameLayout.VISIBLE
 
-            loadImage()
-            sinopse.text = mAnime?.sinopse
+                loadImage()
+                sinopse.text = mAnime?.sinopse
+            }, 1000)
         }
-        
+
         isExistsAnime()
         title = mAnime?.name
 
         fab.setOnClickListener {
-
-//            val scene = Scene.getSceneForLayout(layout_master, R.layout.favorite_more, this)
-//           TransitionManager.go(scene)
-
-//            val intent = Intent(this, AddActivity::class.java)
-//            startActivity(intent)
-
             val db = AppDataBase.getDataBase(this)
             val dao = db.getDao()
             if (mAnime != null && !isExist) {
@@ -100,14 +112,16 @@ class AnimeActivity : AppCompatActivity() {
                 dao.insert(episodes)
                 fab.setImageResource(R.drawable.ic_star_white_24dp)
                 db.close()
+                isExist = true
                 return@setOnClickListener
             }
 
-            if (mAnime != null && isExist){
-                dao.deleteAnime(mAnimeEpisodes?.anime)
-                isExist = false
+            if (mAnime != null && isExist) {
+                val animeEpisodes = dao.getAnimeById(mAnime!!.id)
+                dao.deleteAnime(animeEpisodes?.anime)
                 fab.setImageResource(R.drawable.ic_star_border_white_24dp)
                 db.close()
+                isExist = false
                 return@setOnClickListener
             }
         }
@@ -167,33 +181,100 @@ class AnimeActivity : AppCompatActivity() {
 
     private fun loadImage() {
         Glide.with(this)
+            .asBitmap()
             .load(mAnime?.img)
-            .listener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    supportStartPostponedEnterTransition()
-                    return false
+            .into(object : BitmapImageViewTarget(content_img) {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    super.onResourceReady(resource, transition)
+                    createPaletteFromImageView()
                 }
-
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    supportStartPostponedEnterTransition()
-                    return false
-                }
-
             })
-            .into(content_img)
 
         container_anime.visibility = FrameLayout.VISIBLE
+        circularAnim()
+    }
+
+    private fun createPaletteFromImageView() {
+        val bitmap = (content_img.drawable as BitmapDrawable?)?.bitmap
+        if (bitmap != null) {
+            Palette.from(bitmap)
+                .generate {
+                    val changeBounds = ChangeBounds()
+                    changeBounds.duration = 700
+                    changeBounds.interpolator = AccelerateDecelerateInterpolator()
+                    with(toolbar) {
+                        setBackgroundColor(
+                            it?.vibrantSwatch?.rgb ?: ContextCompat.getColor(
+                                this@AnimeActivity,
+                                R.color.colorPrimary
+                            )
+                        )
+                        setTitleTextColor(
+                            it?.vibrantSwatch?.titleTextColor ?: ContextCompat.getColor(
+                                context,
+                                android.R.color.white
+                            )
+                        )
+                    }
+
+                    with(appbar) {
+                        setBackgroundColor(
+                            it?.vibrantSwatch?.rgb ?: ContextCompat.getColor(
+                                this@AnimeActivity,
+                                R.color.colorPrimary
+                            )
+                        )
+                    }
+
+                    window.statusBarColor = it?.vibrantSwatch?.rgb ?: ContextCompat.getColor(
+                        this@AnimeActivity,
+                        R.color.colorPrimary
+                    )
+
+                    layout_master.setBackgroundColor(
+                        it?.vibrantSwatch?.rgb ?: ContextCompat.getColor(
+                            this@AnimeActivity,
+                            R.color.colorPrimary
+                        )
+                    )
+
+                    with(collapsebar) {
+                        contentScrim = ColorDrawable(
+                            it?.vibrantSwatch?.rgb ?: ContextCompat.getColor(
+                                this@AnimeActivity,
+                                R.color.colorPrimary
+                            )
+                        )
+                    }
+
+                    with(sinopse) {
+                        setTextColor(
+                            it?.vibrantSwatch?.titleTextColor ?: ContextCompat.getColor(
+                                context,
+                                R.color.colorPrimaryDark
+                            )
+                        )
+                    }
+
+                    val backIcon = getDrawable(R.drawable.ic_arrow_back_white_24dp)
+                    backIcon?.setColorFilter(
+                        it?.vibrantSwatch?.titleTextColor ?: ContextCompat.getColor(
+                            this@AnimeActivity,
+                            R.color.colorPrimaryDark
+                        ), PorterDuff.Mode.SRC_ATOP
+                    )
+                    supportActionBar?.setHomeAsUpIndicator(backIcon)
+
+                    mAdapter.color = it?.vibrantSwatch?.titleTextColor ?: ContextCompat.getColor(
+                        this@AnimeActivity,
+                        android.R.color.white
+                    )
+
+                    mAdapter.notifyDataSetChanged()
+
+//                    TransitionManager.beginDelayedTransition(container, changeBounds)
+                }
+        }
     }
 
     private fun isExistsAnime() {
@@ -205,12 +286,27 @@ class AnimeActivity : AppCompatActivity() {
 
             mAnimeEpisodes = anime
 
-            if(anime != null) {
+            if (anime != null) {
                 isExist = true
                 fab.setImageResource(R.drawable.ic_star_white_24dp)
             }
 
         }
+    }
+
+    private fun circularAnim() {
+        val x = layout_master.right
+        val y = layout_master.bottom
+        val startRadius = 0
+        val endRadius = hypot(container.width.toDouble(), container.height.toDouble())
+        val animator = ViewAnimationUtils.createCircularReveal(
+            layout_master, x, y,
+            startRadius.toFloat(), endRadius.toFloat()
+        )
+        layout_master.visibility = CoordinatorLayout.VISIBLE
+        animator.duration = 700
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        animator.start()
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

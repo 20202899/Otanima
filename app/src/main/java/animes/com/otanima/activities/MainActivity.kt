@@ -64,18 +64,18 @@ class MainActivity : AppCompatActivity() {
 
         recyclerview_sheet.setHasFixedSize(true)
         recyclerview_sheet.layoutManager = GridLayoutManager(
-            this, 1,
+            this, 2,
             GridLayoutManager.VERTICAL, false
         ).apply {
-//            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-//                override fun getSpanSize(position: Int): Int {
-//                    return if (position == 0)
-//                        2
-//                    else
-//                        1
-//                }
-//
-//            }
+            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    return if (position == 0)
+                        2
+                    else
+                        1
+                }
+
+            }
         }
         recyclerview_sheet.adapter = mAdapter
     }
