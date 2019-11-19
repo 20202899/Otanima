@@ -86,6 +86,8 @@ class LastAddedAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 context.startActivity(intent)
             }
 
+
+
             setAnimation(holder, position)
         }
     }
