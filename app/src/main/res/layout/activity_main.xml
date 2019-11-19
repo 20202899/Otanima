@@ -15,6 +15,7 @@
         android:layout_height="350dp"
         android:theme="@style/AppTheme.AppBarOverlay">
         <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:fitsSystemWindows="true"
             app:titleEnabled="false"
             android:id="@+id/collapsebar"
             app:contentScrim="@color/colorPrimary"
@@ -64,7 +65,7 @@
                     <RelativeLayout
                         app:layout_collapseMode="pin"
                         android:id="@+id/today"
-                        android:background="@color/colorPrimary"
+                        android:background="@color/colorPrimaryDark"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
